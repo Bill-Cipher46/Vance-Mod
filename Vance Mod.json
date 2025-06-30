@@ -1,0 +1,9 @@
+{
+    "id": "Vance",
+    "name": "Vance Mod",
+    "author": ["Bill Cipher"],
+    "description": "Put memes of JD Vance in the game",
+    "prefix": "vance",
+    "main_file": "Vance Mod.lua",
+    "badge_colour": "800020"
+}
