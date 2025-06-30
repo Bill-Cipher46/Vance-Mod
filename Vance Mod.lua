@@ -5,27 +5,6 @@
   py = 558
 }
 
---Nightmare
-SMODS.Joker{
-  key = 'Nightmare Vance',
-  loc_txt = {
-    name = 'Nightmare Vance',
-    text = {
-      "Retrigger the {C:attention}last{} played",
-      "card used in scoring",
-      "{C:attention}2{} additional times"
-    } 
-  },
-  
-  rarity = 2,
-  discovered = true,
-  atlas = 'VanceMod',
-  pos = {x = 1, y = 0},
-  cost = 8,
-  
-}
-
-
 --Child -- Done!
 SMODS.Joker{
   key = 'Child Vance',
@@ -176,7 +155,6 @@ SMODS.Joker{
     pos = {x=0, y=0},
     cost = 6,
     blueprint_compat = true,
-
     config = { extra = {perma_mult = 2}},
 
     loc_vars = function(self, info_queue, card)
@@ -197,6 +175,96 @@ SMODS.Joker{
       end
     end
 
+}
+
+--Keanu - done!
+SMODS.Joker{
+  key = 'Keanu Vance',
+  loc_txt = {
+    name = 'Keanu Vance',
+    text = {
+      "{C:attention}First two{} played and scoring",
+      "cards give {C:white,X:mult}+#1#{} Mult. {C:attention}Third",
+      "played and scoring card",
+      "gives {C:white,X:mult}+#2#{} Mult"
+    } 
+  },
+  
+  rarity = 2,
+  atlas = 'VanceMod',
+  pos = {x = 3, y = 1},
+  cost = 6,
+  blueprint_compat = true,
+  config = { extra = { nomult = 0, mult = 7 } },
+
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.nomult, card.ability.extra.mult } }
+  end,
+
+  calculate = function(self, card, context)
+    if context.cardarea == G.play then
+      local card1 = context.scoring_hand[1]
+      local card2 = context.scoring_hand[2]
+      local card3 = context.scoring_hand[3]
+      
+      if context.other_card == card1 or context.other_card == card2 then
+        return {
+          mult_mod = card.ability.extra.nomult,
+          colour = G.C.MULT,
+          message = "+0"
+        }
+      end
+      if context.other_card == card3 then
+        return {
+          mult_mod = card.ability.extra.mult,
+          colour = G.C.MULT,
+          message = "+7"
+        }
+      end
+    end
+  end
+  
+}
+
+--Nightmare - done!
+SMODS.Joker{
+  key = 'Nightmare Vance',
+  loc_txt = {
+    name = 'Nightmare Vance',
+    text = {
+      "Retrigger the {C:attention}last{} played",
+      "card used in scoring",
+      "{C:attention}#1#{} additional times"
+    } 
+  },
+  
+  rarity = 2,
+  atlas = 'VanceMod',
+  pos = {x = 1, y = 0},
+  cost = 6,
+  blueprint_compat = true,
+  config = {
+    extra = {
+      repetitions = 2
+    }
+  },
+
+  loc_vars = function(self, info_queue, card)
+    return {
+      vars = {
+        card.ability.extra.repetitions
+      }
+    }
+  end,
+
+  calculate = function(self, card, context)
+    if context.repetition and context.cardarea == G.play and context.other_card == context.scoring_hand[#context.scoring_hand] then
+      return {
+        repetitions = card.ability.extra.repetitions
+      }
+    end
+  end
+  
 }
 
 --Baby
@@ -269,52 +337,6 @@ SMODS.Joker{
   atlas = 'VanceMod',
   pos = {x = 2, y = 1},
   cost = 20,
-  
-}
-
---Keanu
-SMODS.Joker{
-  key = 'Keanu Vance',
-  loc_txt = {
-    name = 'Keanu Vance',
-    text = {
-      "{C:attention}First two{} played and scoring",
-      "cards give {C:white,X:mult}+#1#{} Mult. {C:attention}Third",
-      "played and scoring card",
-      "gives {C:white,X:mult}+#2#{} Mult"
-    } 
-  },
-  
-  rarity = 3,
-  atlas = 'VanceMod',
-  pos = {x = 3, y = 1},
-  cost = 8,
-  blueprint_compat = true,
-  config = { extra = { nomult = 0, mult = 7 } },
-
-  loc_vars = function(self, info_queue, card)
-    return { vars = { card.ability.extra.nomult, card.ability.extra.mult } }
-  end,
-
-  calculate = function(self, card, context)
-    if context.cardarea == G.play then
-      local card1 = context.scoring_hand[1]
-      local card2 = context.scoring_hand[2]
-      local card3 = context.scoring_hand[3]
-      
-      if context.other_card == card1 or context.other_card == card2 then
-        return {
-          mult = card.ability.extra.nomult
-        }
-      end
-      if context.other_card == card3 then
-        return {
-          mult = card.ability.extra.mult
-        }
-      end
-
-    end
-  end
   
 }
 
