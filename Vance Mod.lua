@@ -71,6 +71,7 @@ SMODS.Joker{
   pos = {x = 5, y = 0},
   cost = 6,
   blueprint_compat = true,
+  perishable_compat = false,
   config = { extra = { Xmult = 1, Xmult_gain = 0.2 } },
 
   loc_vars = function(self, info_queue, card)
@@ -119,8 +120,8 @@ SMODS.Joker{
   pos = {x = 1, y = 1},
   cost = 7,
   blueprint_compat = true,
-  
   config = { extra = { Xmult = 1.5 } },
+
   loc_vars = function(self, info_queue, card)
     return { vars = { card.ability.extra.Xmult } }
   end,
@@ -267,23 +268,61 @@ SMODS.Joker{
   
 }
 
---Baby
+--lil - done!
 SMODS.Joker{
-  key = 'Baby Vance',
+  key = 'lil',
   loc_txt = {
-    name = 'Baby Vance',
+    name = 'Lil Vance',
     text = {
-      "{C:mult}+8{} mult and {C:attention}+1{} hand",
-      "size. At end of round,",
-      "additional {C:mult}+8{} mult",
-      "and {C:attention}-1{} hand size"
+      "Gain {C:mult}+#1#{} Mult if played and",
+      "scoring hand contains only",
+      "cards of rank {C:attention}5{} or lower",
+      "{C:inactive}(Currently {C:mult}+#2#{} Mult)"
     } 
   },
   
   rarity = 2,
   atlas = 'VanceMod',
   pos = {x = 3, y = 0},
-  cost = 7,
+  cost = 6,
+  blueprint_compat = false,
+  eternal_compat = false,
+  perishable_compat = false,
+  config = {
+    extra = {
+      mult_gain = 2,
+      mult = 0
+    }
+  },
+
+  loc_vars = function(self, info_queue, card)
+    return{
+      vars = {
+        card.ability.extra.mult_gain,
+        card.ability.extra.mult
+      }
+    }
+  end,
+
+  calculate = function(self, card, context)
+    if context.before and context.main_eval and not context.blueprint then
+      local bigCards = false
+      for k, v in ipairs(context.scoring_hand) do
+        if v:get_id() > 5 then
+          bigCards = true
+        end
+      end
+      if bigCards == false then
+        card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
+      end
+    end
+
+    if context.joker_main then
+      return {
+        mult = card.ability.extra.mult
+      }
+    end
+  end
   
 }
 
