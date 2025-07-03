@@ -326,22 +326,51 @@ SMODS.Joker{
   
 }
 
---Art
+--Art - done!
 SMODS.Joker{
   key = 'Vance Art',
   loc_txt = {
     name = 'Vance Art',
     text = {
-      "{C:attention}+1{} hand size for",
-      "every consumable in",
-      "your consumable slot"
+      "All played {C:attention}number{} cards",
+      "become {C:attention,T:info_queue[1]}Wild{} cards",
+      "when scored",
     } 
   },
   
   rarity = 2,
   atlas = 'VanceMod',
   pos = {x = 6, y = 0},
-  cost = 6,
+  cost = 5,
+  blueprint_compat = false,
+
+  loc_vars = function(self, info_queue, card)
+    info_queue[#info_queue + 1] = G.P_CENTERS.m_wild
+  end,
+
+  calculate = function(self, card, context)
+    if context.before and context.main_eval and not context.blueprint then
+      local numbers = 0
+      for _, scored_card in ipairs(context.scoring_hand) do
+        if not scored_card:is_face() then
+          numbers = numbers + 1
+          scored_card:set_ability('m_wild', nil, true)
+          G.E_MANAGER:add_event(Event({
+            func = function()
+              scored_card:juice_up()
+              return true
+            end
+          }))
+        end
+      end
+      if numbers > 0 then
+        return {
+          message = "Wild",
+          colour = G.C.EDITION
+        }
+      end
+    end
+  end
   
 }
 
