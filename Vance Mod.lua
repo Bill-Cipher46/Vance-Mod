@@ -5,6 +5,56 @@
   py = 558
 }
 
+--Keanu - done!
+SMODS.Joker{
+  key = 'Keanu Vance',
+  loc_txt = {
+    name = 'Keanu Vance',
+    text = {
+      "{C:attention}First two{} played and scoring",
+      "cards give {C:white,X:mult}+#1#{} Mult. {C:attention}Third",
+      "played and scoring card",
+      "gives {C:white,X:mult}+#2#{} Mult"
+    } 
+  },
+  
+  rarity = 1,
+  atlas = 'VanceMod',
+  pos = {x = 3, y = 1},
+  cost = 6,
+  blueprint_compat = true,
+  config = { extra = { nomult = 0, mult = 7 } },
+
+  loc_vars = function(self, info_queue, card)
+    return { vars = { card.ability.extra.nomult, card.ability.extra.mult } }
+  end,
+
+  calculate = function(self, card, context)
+    if context.cardarea == G.play then
+      local card1 = context.scoring_hand[1]
+      local card2 = context.scoring_hand[2]
+      local card3 = context.scoring_hand[3]
+      
+      if context.other_card == card1 or context.other_card == card2 then
+        return {
+          mult_mod = card.ability.extra.nomult,
+          colour = G.C.MULT,
+          message = "+0"
+        }
+      end
+      if context.other_card == card3 then
+        return {
+          mult_mod = card.ability.extra.mult,
+          colour = G.C.MULT,
+          message = "+7"
+        }
+      end
+    end
+  end
+  
+}
+
+
 --Child -- Done!
 SMODS.Joker{
   key = 'Child Vance',
@@ -178,55 +228,6 @@ SMODS.Joker{
 
 }
 
---Keanu - done!
-SMODS.Joker{
-  key = 'Keanu Vance',
-  loc_txt = {
-    name = 'Keanu Vance',
-    text = {
-      "{C:attention}First two{} played and scoring",
-      "cards give {C:white,X:mult}+#1#{} Mult. {C:attention}Third",
-      "played and scoring card",
-      "gives {C:white,X:mult}+#2#{} Mult"
-    } 
-  },
-  
-  rarity = 2,
-  atlas = 'VanceMod',
-  pos = {x = 3, y = 1},
-  cost = 6,
-  blueprint_compat = true,
-  config = { extra = { nomult = 0, mult = 7 } },
-
-  loc_vars = function(self, info_queue, card)
-    return { vars = { card.ability.extra.nomult, card.ability.extra.mult } }
-  end,
-
-  calculate = function(self, card, context)
-    if context.cardarea == G.play then
-      local card1 = context.scoring_hand[1]
-      local card2 = context.scoring_hand[2]
-      local card3 = context.scoring_hand[3]
-      
-      if context.other_card == card1 or context.other_card == card2 then
-        return {
-          mult_mod = card.ability.extra.nomult,
-          colour = G.C.MULT,
-          message = "+0"
-        }
-      end
-      if context.other_card == card3 then
-        return {
-          mult_mod = card.ability.extra.mult,
-          colour = G.C.MULT,
-          message = "+7"
-        }
-      end
-    end
-  end
-  
-}
-
 --Nightmare - done!
 SMODS.Joker{
   key = 'Nightmare Vance',
@@ -391,20 +392,50 @@ SMODS.Joker{
   
 }
 
---Modok
+--Modok - done!
 SMODS.Joker{
   key = 'Modok Vance',
   loc_txt = {
     name = 'Modok Vance',
     text = {
-      "TBD"
+      "{C:mult}+#1#{} Mult for each",
+      "{C:attention}Blind{} skipped this run",
+      "{C:inactive}(Currently {C:mult}+#2#{} Mult)"
     } 
   },
   
-  rarity = 4,
+  rarity = 2,
   atlas = 'VanceMod',
   pos = {x = 2, y = 1},
-  cost = 20,
+  cost = 5,
+  config = {
+    extra = {
+      mult = 10
+    }
+  },
+
+  loc_vars = function(self, info_queeu, card)
+    return{
+      vars = {
+        card.ability.extra.mult,
+        G.GAME.skips * card.ability.extra.mult
+      }
+    }
+  end,
+
+  calculate = function(self, card, context)
+    if context.skip_blind and not context.blueprint then
+      return {
+        message = localize { type = 'variable', key = 'a_mult', vars = { G.GAME.skips * card.ability.extra.mult } },
+        colour = G.C.MULT
+      }
+    end
+    if context.joker_main then
+      return {
+        mult = G.GAME.skips * card.ability.extra.mult
+      }
+    end
+  end
   
 }
 
