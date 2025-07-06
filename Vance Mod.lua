@@ -62,7 +62,7 @@ SMODS.Joker{
     name = 'Child Vance',
     text = {
       "{C:green}#1# in #2#{} chance to add",
-      "{C:edition,T:e_poly}polychrome{} edition to",
+      "{C:edition,T:info_queue[1]}polychrome{} edition to",
       "played and scoring {C:attention}face{} cards"
     } 
   },
@@ -75,6 +75,7 @@ SMODS.Joker{
   config = { extra = { odds = 4 } },
 
   loc_vars = function(self, info_queue, card)
+    info_queue[#info_queue + 1] = G.P_CENTERS.e_polychrome
     return { vars = { (G.GAME.probabilities.normal or 1), card.ability.extra.odds } }
   end,
 
@@ -375,23 +376,6 @@ SMODS.Joker{
   
 }
 
---Emo
-SMODS.Joker{
-  key = 'Emo Vance',
-  loc_txt = {
-    name = 'My Chemical RoVance',
-    text = {
-      "Negative tag?"
-    } 
-  },
-  
-  rarity = 4,
-  atlas = 'VanceMod',
-  pos = {x = 0, y = 1},
-  cost = 100,
-  
-}
-
 --Modok - done!
 SMODS.Joker{
   key = 'Modok Vance',
@@ -434,6 +418,76 @@ SMODS.Joker{
       return {
         mult = G.GAME.skips * card.ability.extra.mult
       }
+    end
+  end
+  
+}
+
+
+--Emo - done!
+SMODS.Joker{
+  key = 'Emo Vance',
+  loc_txt = {
+    name = 'My Chemical RoVance',
+    text = {
+      "Gain a free {C:dark_edition,T:info_queue[1]}Negative{} tag",
+      "after playing {C:attention}#1#{} consecutive",
+      "hands with less than {C:attention}#2#{} cards",
+      "{C:inactive}(Currently {C:attention}#3#{C:inactive}/#1#)"
+    } 
+  },
+  
+  rarity = 3,
+  atlas = 'VanceMod',
+  pos = {x = 0, y = 1},
+  cost = 9,
+  config = {
+    extra = {
+      emo_hands = 0,
+      cards = 3,
+      total_hands = 3
+    }
+  },
+
+  loc_vars = function(self, info_queue, card)
+    info_queue[#info_queue+1] = { key = 'tag_negative', set = 'Tag' }
+    return{
+      vars = {
+        card.ability.extra.total_hands,
+        card.ability.extra.cards,
+        card.ability.extra.emo_hands
+      }
+    }
+  end,
+
+  calculate = function(self, card, context)
+    if context.joker_main and #context.full_hand < card.ability.extra.cards then
+      card.ability.extra.emo_hands = card.ability.extra.emo_hands + 1
+      return {
+        message = (card.ability.extra.emo_hands < card.ability.extra.total_hands) and
+          (card.ability.extra.emo_hands .. '/' .. card.ability.extra.total_hands) or
+          localize('k_active_ex'),
+        colour = G.C.FILTER
+      }
+    else
+      if context.joker_main and card.ability.extra.emo_hands > 0 then
+        card.ability.extra.emo_hands = 0
+        return {
+          message = localize('k_reset')
+        }
+      end
+    end
+
+    if card.ability.extra.emo_hands >= card.ability.extra.total_hands then
+      card.ability.extra.emo_hands = 0
+      G.E_MANAGER:add_event(Event({
+        func = (function()
+          add_tag(Tag('tag_negative'))
+          play_sound('generic1', 0.9 + math.random() * 0.1, 0.8)
+          play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+          return true
+        end)
+      }))
     end
   end
   
