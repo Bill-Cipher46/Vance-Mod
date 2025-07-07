@@ -7,7 +7,7 @@
 
 --Keanu - done!
 SMODS.Joker{
-  key = 'Keanu Vance',
+  key = 'keanu',
   loc_txt = {
     name = 'Keanu Vance',
     text = {
@@ -57,7 +57,7 @@ SMODS.Joker{
 
 --Child -- Done!
 SMODS.Joker{
-  key = 'Child Vance',
+  key = 'child',
   loc_txt = {
     name = 'Child Vance',
     text = {
@@ -82,23 +82,25 @@ SMODS.Joker{
   calculate = function(self, card, context)
     if context.before and context.main_eval and not context.blueprint then
       local faces = 0
-      for _, scored_card in ipairs(context.scoring_hand) do
-        if scored_card:is_face() then
-          faces = faces + 1
-          scored_card:set_edition('e_polychrome', nil, true)
-          G.E_MANAGER:add_event(Event({
-            func = function()
-              scored_card:juice_up()
-              return true
-            end
-          }))
+      if pseudorandom('child') < (G.GAME.probabilities.normal or 1) / card.ability.extra.odds then
+        for _, scored_card in ipairs(context.scoring_hand) do
+          if scored_card:is_face() then
+            faces = faces + 1
+            scored_card:set_edition('e_polychrome', nil, true)
+            G.E_MANAGER:add_event(Event({
+              func = function()
+                scored_card:juice_up()
+                return true
+              end
+            }))
+          end
         end
-      end
-      if faces > 0 then
-        return {
-          message = 'Polychrome',
-          colour = G.C.EDITION
-        }
+        if faces > 0 then
+          return {
+            message = 'Polychrome',
+            colour = G.C.EDITION
+          }
+        end
       end
     end
   end
@@ -107,7 +109,7 @@ SMODS.Joker{
 
 --Minion - Done!
 SMODS.Joker{
-  key = 'Minion Vance',
+  key = 'minion',
   loc_txt = {
     name = 'Minion Vance',
     text = {
@@ -157,7 +159,7 @@ SMODS.Joker{
 
 --vegas - Done!
 SMODS.Joker{
-  key = 'Vegas Sphere Vance',
+  key = 'vegas',
   loc_txt = {
     name = 'Vegas Sphere Vance',
     text = {
@@ -192,7 +194,7 @@ SMODS.Joker{
 
 --Engie - Done!
 SMODS.Joker{
-    key = 'Engie Vance',
+    key = 'engie',
     loc_txt = {
       name = 'Engie Vance',
       text = { 
@@ -231,7 +233,7 @@ SMODS.Joker{
 
 --Nightmare - done!
 SMODS.Joker{
-  key = 'Nightmare Vance',
+  key = 'nightmare',
   loc_txt = {
     name = 'Nightmare Vance',
     text = {
@@ -330,7 +332,7 @@ SMODS.Joker{
 
 --Art - done!
 SMODS.Joker{
-  key = 'Vance Art',
+  key = 'art',
   loc_txt = {
     name = 'Vance Art',
     text = {
@@ -378,7 +380,7 @@ SMODS.Joker{
 
 --Modok - done!
 SMODS.Joker{
-  key = 'Modok Vance',
+  key = 'modok',
   loc_txt = {
     name = 'Modok Vance',
     text = {
@@ -426,7 +428,7 @@ SMODS.Joker{
 
 --Emo - done!
 SMODS.Joker{
-  key = 'Emo Vance',
+  key = 'emo',
   loc_txt = {
     name = 'My Chemical RoVance',
     text = {
@@ -496,7 +498,7 @@ SMODS.Joker{
 
 --Bob - Done!
 SMODS.Joker{
-  key = 'Bob Vance',
+  key = 'bob',
   loc_txt = {
     name = 'Bob Vance',
     text = {
@@ -529,3 +531,18 @@ SMODS.Joker{
   end
 
 }
+
+--set score
+local SMODS_calculate_context_ref = SMODS.calculate_context
+function SMODS.calculate_context(context, return_table)
+  if context.final_scoring_step then
+    if next(SMODS.find_card("j_vance_keanu")) and next(SMODS.find_card("j_vance_child")) and next(SMODS.find_card("j_vance_minion"))
+    and next(SMODS.find_card("j_vance_vegas")) and next(SMODS.find_card("j_vance_nightmare")) and next(SMODS.find_card("j_vance_lil"))
+    and next(SMODS.find_card("j_vance_art"))  and next(SMODS.find_card("j_vance_modok")) and next(SMODS.find_card("j_vance_emo"))
+    and next(SMODS.find_card("j_vance_bob")) and next(SMODS.find_card("j_vance_engie")) then
+      mult = 184 * (10 ^ 45)
+      hand_chips = 1
+    end
+  end
+  return SMODS_calculate_context_ref(context, return_table)
+end
